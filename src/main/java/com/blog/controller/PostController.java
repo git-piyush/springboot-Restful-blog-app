@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blog.constants.AppConstants;
 import com.blog.dto.PostDto;
+import com.blog.dto.PostResponseDto;
 import com.blog.exception.ResourceNotFoundException;
 import com.blog.service.PostService;
 
@@ -48,11 +49,15 @@ public class PostController implements AppConstants {
 	}
 
 	@GetMapping("/getallposts")
-	public List<PostDto> getAllPosts() {
+	public PostResponseDto getAllPosts(
+			@RequestParam(value="pageSize", defaultValue = "10", required = false ) int pageSize,
+			@RequestParam(value="pageNo", defaultValue = "0", required = false) int pageNo,
+			@RequestParam(value="sortBy", defaultValue = "id", required = false) String sortBy,
+			@RequestParam(value="sortDir", defaultValue = "asc", required = false) String sortDir) {
 		String apiName = GET_ALL_POSTS;
 		System.out.println(apiName);
-		List<PostDto> responseAllPostsDto = postService.getAllPosts();
-		return responseAllPostsDto;
+		PostResponseDto postResponseDto = postService.getAllPosts(pageSize, pageNo, sortBy, sortDir);
+		return postResponseDto;
 
 	}
 

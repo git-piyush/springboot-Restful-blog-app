@@ -5,9 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.blog.dto.PostDto;
+import com.blog.dto.PostResponseDto;
 import com.blog.entity.Post;
 import com.blog.exception.ResourceNotFoundException;
 import com.blog.repository.PostRepository;
@@ -64,7 +69,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public List<PostDto> getAllPosts() {
+	public PostResponseDto getAllPosts(int pageSize, int pageNo, String sortBy, String sortDir) {
 
 		/*
 		 * List<PostDto> allPostsDto=new ArrayList<PostDto>(); List<Post> allPosts =
@@ -76,11 +81,31 @@ public class PostServiceImpl implements PostService {
 		 * OR
 		 */
 		// java streams implementation
-		List<Post> allPosts = postRepository.findAll();
 
-		List<PostDto> allPostsResponse = allPosts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
+		// Pageable page = PageRequest.of(pageNo, pageSize); //if sorting not required
 
-		return allPostsResponse;
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.toString()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+
+		Pageable page = PageRequest.of(pageNo, pageSize, sort);
+
+		Page<Post> posts = postRepository.findAll(page);
+
+		List<Post> respectivePosts = posts.getContent();
+
+		List<PostDto> allPostsResponse = respectivePosts.stream().map(post -> mapToDto(post))
+				.collect(Collectors.toList());
+
+		PostResponseDto postResponseDto = new PostResponseDto();
+
+		postResponseDto.setPostDto(allPostsResponse);
+		postResponseDto.setPageNo(posts.getNumber());
+		postResponseDto.setPageSize(posts.getSize());
+		postResponseDto.setTotalPages(posts.getTotalPages());
+		postResponseDto.setTotalElement(posts.getTotalElements());
+		postResponseDto.setLast(posts.isLast());
+
+		return postResponseDto;
 	}
 
 	@Override
@@ -106,11 +131,11 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public void deletePostById(Long id) {
-		
-		Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post","Id", id));
-		
+
+		Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", id));
+
 		postRepository.deleteById(id);
-		
+
 	}
 
 }
