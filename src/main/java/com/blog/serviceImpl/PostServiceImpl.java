@@ -56,6 +56,7 @@ public class PostServiceImpl implements PostService {
 
 	private Post mapToEntity(PostDto postDto) {
 		Post newPost = new Post();
+		newPost.setId(postDto.getId());
 		newPost.setTitle(postDto.getTitle());
 		newPost.setDescription(postDto.getDescription());
 		newPost.setContent(postDto.getContent());
@@ -64,23 +65,21 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public List<PostDto> getAllPosts() {
-		
-	/*	List<PostDto> allPostsDto=new ArrayList<PostDto>();
+
+		/*
+		 * List<PostDto> allPostsDto=new ArrayList<PostDto>(); List<Post> allPosts =
+		 * postRepository.findAll(); for(Post post : allPosts) {
+		 * 
+		 * System.out.println(post); System.out.println(mapToEntity(post));
+		 * allPostsDto.add(mapToEntity(post)); } return allPostsDto;
+		 * 
+		 * OR
+		 */
+		// java streams implementation
 		List<Post> allPosts = postRepository.findAll();
-		for(Post post : allPosts) {
-			
-			System.out.println(post);
-			System.out.println(mapToEntity(post));
-			allPostsDto.add(mapToEntity(post));
-		}
-		return allPostsDto;
-		
-		 OR */
-		//java streams implementation
-		List<Post> allPosts = postRepository.findAll();
-		
-		List<PostDto> allPostsResponse =  allPosts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
-		
+
+		List<PostDto> allPostsResponse = allPosts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
+
 		return allPostsResponse;
 	}
 
@@ -89,6 +88,29 @@ public class PostServiceImpl implements PostService {
 		Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("post", "id", id));
 		PostDto responsePostDto = mapToDto(post);
 		return responsePostDto;
-	} 
+	}
+
+	@Override
+	public PostDto updatePost(PostDto post, Long id) {
+		PostDto currentPost = getPostById(id);
+		// feed the updated data into current post
+		currentPost.setTitle(post.getTitle());
+		currentPost.setDescription(post.getDescription());
+		currentPost.setContent(post.getContent());
+
+		// convert DTO to entity and save it
+		Post updatedPost = postRepository.save(mapToEntity(currentPost));
+
+		return mapToDto(updatedPost);
+	}
+
+	@Override
+	public void deletePostById(Long id) {
+		
+		Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post","Id", id));
+		
+		postRepository.deleteById(id);
+		
+	}
 
 }

@@ -5,9 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +51,8 @@ public class PostController implements AppConstants {
 	public List<PostDto> getAllPosts() {
 		String apiName = GET_ALL_POSTS;
 		System.out.println(apiName);
-		return postService.getAllPosts();
+		List<PostDto> responseAllPostsDto = postService.getAllPosts();
+		return responseAllPostsDto;
 
 	}
 
@@ -58,15 +61,62 @@ public class PostController implements AppConstants {
 		String apiName = GET_POST_BY_ID;
 		System.out.println(apiName);
 
-		//throw new ResourceNotFoundException("Post","id", id);
-		
-		PostDto post = postService.getPostById(id);
+		// throw new ResourceNotFoundException("Post","id", id);
 
-		ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(post, HttpStatus.OK);
+		PostDto fetchedPost = postService.getPostById(id);
 
-		return responsePostDto;
+		/*	ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(fetchedPost, HttpStatus.OK);
+
+		return responsePostDto;    
 		
+		OR  */
+		
+		return ResponseEntity.ok(fetchedPost);
 
 	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<PostDto> updatePost(@RequestBody PostDto post, @PathVariable Long id) {
+		String apiName = Update_Post;
+		System.out.println(apiName);
+
+		PostDto updatedPost = postService.updatePost(post, id);
+
+		//ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(updatedPost, HttpStatus.OK);
+
+		//return responsePostDto;
+		
+		//or
+		
+		return ResponseEntity.ok(updatedPost);
+
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deletePost(@PathVariable Long id){
+		System.out.println(Delete_Post);
+		String errorMessage;
+		try {
+			postService.deletePostById(id);
+			errorMessage = "Post Deleted Sucessfully!!";
+		} catch (Exception e) {
+			throw new ResourceNotFoundException("Post","Id",id);
+			//errorMessage = "Exception in Post Deletion!!";
+		}
+		return new ResponseEntity<String>(errorMessage, HttpStatus.OK);
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
