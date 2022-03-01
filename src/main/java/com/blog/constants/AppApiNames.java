@@ -1,6 +1,6 @@
 package com.blog.constants;
 
-public interface AppConstants {
+public interface AppApiNames {
 
 	 String CREATE_POST_API = "Create Post Api";
 	 String GET_ALL_POSTS = "Get All Posts";
