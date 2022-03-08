@@ -37,12 +37,12 @@ public class PostController implements AppApiNames {
 	// create blog rest api
 	// @RequestMapping(name = RequestMethod.POST) or
 	@PostMapping
-	public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
+	public ResponseEntity<PostDto> createPost(@RequestBody PostDto requestPostDto) {
 		String apiName = CREATE_POST_API;
 		System.out.println(apiName);
-		PostDto newPost = postService.createPost(postDto);
+		PostDto createdPost = postService.createPost(requestPostDto);
 
-		ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(newPost, HttpStatus.CREATED);
+		ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(createdPost, HttpStatus.CREATED);
 		// System.out.println(postResponse);
 		return responsePostDto;
 
@@ -50,10 +50,10 @@ public class PostController implements AppApiNames {
 
 	@GetMapping("/getallposts")
 	public PostResponseDto getAllPosts(
-			@RequestParam(value="pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false ) int pageSize,
-			@RequestParam(value="pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
-			@RequestParam(value="sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
-			@RequestParam(value="sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
+			@RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+			@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
+			@RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+			@RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
 		String apiName = GET_ALL_POSTS;
 		System.out.println(apiName);
 		PostResponseDto postResponseDto = postService.getAllPosts(pageSize, pageNo, sortBy, sortDir);
@@ -70,12 +70,15 @@ public class PostController implements AppApiNames {
 
 		PostDto fetchedPost = postService.getPostById(id);
 
-		/*	ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(fetchedPost, HttpStatus.OK);
+		/*
+		 * ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(fetchedPost,
+		 * HttpStatus.OK);
+		 * 
+		 * return responsePostDto;
+		 * 
+		 * OR
+		 */
 
-		return responsePostDto;    
-		
-		OR  */
-		
 		return ResponseEntity.ok(fetchedPost);
 
 	}
@@ -87,41 +90,30 @@ public class PostController implements AppApiNames {
 
 		PostDto updatedPost = postService.updatePost(post, id);
 
-		//ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(updatedPost, HttpStatus.OK);
+		// ResponseEntity<PostDto> responsePostDto = new ResponseEntity<>(updatedPost,
+		// HttpStatus.OK);
 
-		//return responsePostDto;
-		
-		//or
-		
+		// return responsePostDto;
+
+		// or
+
 		return ResponseEntity.ok(updatedPost);
 
 	}
-	
+
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deletePost(@PathVariable Long id){
+	public ResponseEntity<String> deletePost(@PathVariable Long id) {
 		System.out.println(Delete_Post);
 		String errorMessage;
 		try {
 			postService.deletePostById(id);
 			errorMessage = "Post Deleted Sucessfully!!";
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Post","Id",id);
-			//errorMessage = "Exception in Post Deletion!!";
+			throw new ResourceNotFoundException("Post", "Id", id);
+			// errorMessage = "Exception in Post Deletion!!";
 		}
 		return new ResponseEntity<String>(errorMessage, HttpStatus.OK);
-		
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 }
