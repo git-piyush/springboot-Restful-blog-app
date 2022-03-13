@@ -10,6 +10,7 @@ public class SpringbootBlogAppApplication {
 
 	@Bean
 	public ModelMapper modelMapper() {
+		System.out.println("Hello");
 		return new ModelMapper();
 	}
 	
