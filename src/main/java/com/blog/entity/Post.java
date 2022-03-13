@@ -22,9 +22,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -46,6 +49,7 @@ public class Post {
 	private String content;
 	
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private List<Comment> comments = new ArrayList<>();
+	//private List<Comment> comments = new ArrayList<>();
+	private Set<Comment> comments = new HashSet<>();
 	
 }
